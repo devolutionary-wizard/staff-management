@@ -1,3 +1,4 @@
+using Api.Middleware;
 using Microsoft.OpenApi.Models;
 
 namespace Api
@@ -36,6 +37,7 @@ namespace Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "TestApi.WebApi.xml");
             });
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseRouting();
 
             app.UseAuthorization();

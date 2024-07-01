@@ -2,16 +2,17 @@ using Microsoft.AspNetCore.Mvc;
 using Dapper;
 using MySql.Data.MySqlClient;
 using Api.Model;
+using Api.Utils;
+using System.Text;
 
 namespace TestApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/")]
-
     public class StaffController : ControllerBase
     {
         private readonly IConfiguration _configuration;
-        private readonly string connString;
+        private readonly string _connString;
         private readonly ILogger<StaffController> _logger;
 
         public StaffController(IConfiguration configuration, ILogger<StaffController> logger)
@@ -24,18 +25,37 @@ namespace TestApi.Controllers
             var userid = _configuration["DB_USER"] ?? _configuration.GetConnectionString("DB_USER");
             var usersDataBase = _configuration["DB_NAME"] ?? _configuration.GetConnectionString("DB_NAME");
 
-            connString = $"server={host}; userid={userid};pwd={password};port={port};database={usersDataBase}";
+            _connString = $"server={host}; userid={userid}; password={password}; port={port}; database={usersDataBase}";
         }
+
         [HttpGet]
-        public async Task<ActionResult<List<Staff>>> GetAllStaffs()
+        public async Task<ActionResult<List<Staff>>> GetAllStaffs(string? staffId = null, string? gender = null, DateTime? birthdayFrom = null, DateTime? birthdayTo = null)
         {
             try
             {
-                const string query = "SELECT staff_id AS StaffId, full_name AS FullName, birthday, gender FROM Staff;";
-                using (var connection = new MySqlConnection(connString))
+                var queryBuilder = new StringBuilder("SELECT staff_id AS StaffId, full_name AS FullName, birthday, gender FROM staff WHERE 1=1");
+
+                if (!string.IsNullOrEmpty(staffId))
                 {
-                    var result = await connection.QueryAsync<Staff>(query);
-                    return Ok(result);
+                    queryBuilder.Append(" AND staff_id = @StaffId");
+                }
+                if (!string.IsNullOrEmpty(gender))
+                {
+                    queryBuilder.Append(" AND gender = @Gender");
+                }
+                if (birthdayFrom.HasValue)
+                {
+                    queryBuilder.Append(" AND birthday >= @BirthdayFrom");
+                }
+                if (birthdayTo.HasValue)
+                {
+                    queryBuilder.Append(" AND birthday <= @BirthdayTo");
+                }
+                using (var connection = new MySqlConnection(_connString))
+                {
+                    var result = await connection.QueryAsync<Staff>(queryBuilder.ToString(), new { StaffId = staffId, Gender = gender, BirthdayFrom = birthdayFrom, BirthdayTo = birthdayTo });
+                    ApiResponse<List<Staff>> response = new ApiResponse<List<Staff>>(200, "Success", result.ToList());
+                    return Ok(response);
                 }
             }
             catch (Exception ex)
@@ -48,33 +68,33 @@ namespace TestApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddNewStaff(Staff staff)
         {
-            var newStaff = new Staff();
             try
             {
-
-
                 string query = @"INSERT INTO staff (staff_id, full_name, birthday, gender) 
-                 VALUES (@StaffId, @FullName, @Birthday, @Gender)";
+                                 VALUES (@StaffId, @FullName, @Birthday, @Gender)";
                 var param = new DynamicParameters();
                 param.Add("@StaffId", staff.StaffId);
                 param.Add("@FullName", staff.FullName);
                 param.Add("@Birthday", staff.Birthday);
                 param.Add("@Gender", staff.Gender);
-                using (var connection = new MySqlConnection(connString))
+
+                using (var connection = new MySqlConnection(_connString))
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
                     {
-                        newStaff = staff;
+                        return Ok(staff);
+                    }
+                    else
+                    {
+                        return BadRequest("Failed to add new staff.");
                     }
                 }
-                return Ok(newStaff);
-
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error adding new staff.");
                 return StatusCode(500, ex.Message);
-
             }
         }
 
@@ -89,14 +109,14 @@ namespace TestApi.Controllers
             try
             {
                 string query = @"UPDATE staff SET full_name = @FullName, birthday = @Birthday, gender = @Gender 
-                         WHERE staff_id = @StaffID";
+                                 WHERE staff_id = @StaffId";
                 var param = new DynamicParameters();
-                param.Add("@StaffID", staffId);
+                param.Add("@StaffId", staffId);
                 param.Add("@FullName", staff.FullName);
                 param.Add("@Birthday", staff.Birthday);
                 param.Add("@Gender", staff.Gender);
 
-                using (var connection = new MySqlConnection(connString))
+                using (var connection = new MySqlConnection(_connString))
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
@@ -111,6 +131,7 @@ namespace TestApi.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating staff.");
                 return StatusCode(500, ex.Message);
             }
         }
@@ -120,11 +141,11 @@ namespace TestApi.Controllers
         {
             try
             {
-                string query = @"DELETE FROM staff WHERE staff_id = @StaffID";
+                string query = @"DELETE FROM staff WHERE staff_id = @StaffId";
                 var param = new DynamicParameters();
-                param.Add("@StaffID", staffId);
+                param.Add("@StaffId", staffId);
 
-                using (var connection = new MySqlConnection(connString))
+                using (var connection = new MySqlConnection(_connString))
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
@@ -139,9 +160,9 @@ namespace TestApi.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting staff.");
                 return StatusCode(500, ex.Message);
             }
         }
-
     }
 }
