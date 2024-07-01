@@ -1,0 +1,21 @@
+services:
+  db:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: staff-db
+    env_file:
+      - .env  
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_LOG_BIN=ON
+      - MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS=ON
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_general_ci
+    volumes:
+      - ./db/:/var/lib/mysql   
