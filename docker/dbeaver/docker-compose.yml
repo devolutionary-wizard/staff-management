@@ -1,0 +1,13 @@
+services:
+  dbeaver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: staff_dbeaver
+    restart: unless-stopped
+    environment:
+      APP.ANONYMOUSACCESSENABLED: false
+    volumes:
+      - ./cloudbeaver:/opt/cloudbeaver/workspace
+    ports: 
+     - 18978:8978  
