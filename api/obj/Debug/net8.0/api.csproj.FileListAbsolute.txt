@@ -58,3 +58,4 @@
 /Users/denji/self-taugh/staff-management/api/bin/Debug/net8.0/runtimes/unix/lib/netcoreapp2.1/System.Data.SqlClient.dll
 /Users/denji/self-taugh/staff-management/api/bin/Debug/net8.0/runtimes/win/lib/netcoreapp2.1/System.Data.SqlClient.dll
 /Users/denji/self-taugh/staff-management/api/obj/Debug/net8.0/api.sourcelink.json
+/Users/denji/self-taugh/staff-management/api/bin/Debug/net8.0/dotenv.net.dll

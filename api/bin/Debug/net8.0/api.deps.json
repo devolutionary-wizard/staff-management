@@ -13,7 +13,8 @@
           "Microsoft.EntityFrameworkCore": "8.0.6",
           "MySql.Data": "9.0.0",
           "Swashbuckle.AspNetCore": "6.4.0",
-          "System.Data.SqlClient": "4.8.6"
+          "System.Data.SqlClient": "4.8.6",
+          "dotenv.net": "3.2.0"
         },
         "runtime": {
           "api.dll": {}
@@ -32,6 +33,14 @@
           "lib/net7.0/Dapper.dll": {
             "assemblyVersion": "2.0.0.0",
             "fileVersion": "2.1.35.13827"
+          }
+        }
+      },
+      "dotenv.net/3.2.0": {
+        "runtime": {
+          "lib/netstandard2.1/dotenv.net.dll": {
+            "assemblyVersion": "3.2.0.0",
+            "fileVersion": "3.2.0.0"
           }
         }
       },
@@ -459,6 +468,13 @@
       "sha512": "sha512-YKRwjVfrG7GYOovlGyQoMvr1/IJdn+7QzNXJxyMh0YfFF5yvDmTYaJOVYWsckreNjGsGSEtrMTpnzxTUq/tZQw==",
       "path": "dapper/2.1.35",
       "hashPath": "dapper.2.1.35.nupkg.sha512"
+    },
+    "dotenv.net/3.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-shohkuZ2HxhNmLY+jCG5MJreMEtmjbaWyOIoJ920KTDwJHT9JC7WdnmrXCwqJ1JPKo5QY9oDJUEFTlQE8qSZSw==",
+      "path": "dotenv.net/3.2.0",
+      "hashPath": "dotenv.net.3.2.0.nupkg.sha512"
     },
     "Google.Protobuf/3.26.1": {
       "type": "package",
