@@ -1,3 +1,4 @@
+using Api.Helper;
 using Api.Middleware;
 using Microsoft.OpenApi.Models;
 
@@ -15,6 +16,8 @@ namespace Api
         {
             services.AddControllers();
             services.Configure<RouteOptions>(option => option.LowercaseUrls = true);
+
+            services.AddSingleton<DatabaseContext>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo

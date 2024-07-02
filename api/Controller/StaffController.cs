@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
-using MySql.Data.MySqlClient;
 using Api.Model;
 using Api.Utils;
 using System.Text;
+using Api.Helper;
 
 namespace TestApi.Controllers
 {
@@ -11,21 +11,13 @@ namespace TestApi.Controllers
     [Route("api/[controller]/")]
     public class StaffController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
-        private readonly string _connString;
         private readonly ILogger<StaffController> _logger;
+        private readonly DatabaseContext _databaseContext;
 
-        public StaffController(IConfiguration configuration, ILogger<StaffController> logger)
+        public StaffController(ILogger<StaffController> logger, DatabaseContext databaseContext)
         {
-            _configuration = configuration;
             _logger = logger;
-            var host = _configuration["DB_HOST"] ?? "localhost";
-            var port = _configuration["DBPORT"] ?? "3306";
-            var password = _configuration["DB_PASSWORD"] ?? _configuration.GetConnectionString("DB_PASSWORD");
-            var userid = _configuration["DB_USER"] ?? _configuration.GetConnectionString("DB_USER");
-            var usersDataBase = _configuration["DB_NAME"] ?? _configuration.GetConnectionString("DB_NAME");
-
-            _connString = $"server={host}; userid={userid}; password={password}; port={port}; database={usersDataBase}";
+            _databaseContext = databaseContext;
         }
 
         [HttpGet]
@@ -51,7 +43,7 @@ namespace TestApi.Controllers
                 {
                     queryBuilder.Append(" AND birthday <= @BirthdayTo");
                 }
-                using (var connection = new MySqlConnection(_connString))
+                using (var connection = _databaseContext.GetConnection())
                 {
                     var result = await connection.QueryAsync<Staff>(queryBuilder.ToString(), new { StaffId = staffId, Gender = gender, BirthdayFrom = birthdayFrom, BirthdayTo = birthdayTo });
                     ApiResponse<List<Staff>> response = new ApiResponse<List<Staff>>(200, "Success", result.ToList());
@@ -78,7 +70,7 @@ namespace TestApi.Controllers
                 param.Add("@Birthday", staff.Birthday);
                 param.Add("@Gender", staff.Gender);
 
-                using (var connection = new MySqlConnection(_connString))
+                using (var connection = _databaseContext.GetConnection())
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
@@ -116,7 +108,7 @@ namespace TestApi.Controllers
                 param.Add("@Birthday", staff.Birthday);
                 param.Add("@Gender", staff.Gender);
 
-                using (var connection = new MySqlConnection(_connString))
+                using (var connection = _databaseContext.GetConnection())
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
@@ -145,7 +137,7 @@ namespace TestApi.Controllers
                 var param = new DynamicParameters();
                 param.Add("@StaffId", staffId);
 
-                using (var connection = new MySqlConnection(_connString))
+                using (var connection = _databaseContext.GetConnection())
                 {
                     var result = await connection.ExecuteAsync(query, param);
                     if (result > 0)
