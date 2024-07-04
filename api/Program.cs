@@ -16,7 +16,7 @@ namespace Api
             return Host.CreateDefaultBuilder(args)
                     .ConfigureWebHostDefaults(webBuilder =>
                     {
-                        var url = $"http://localhost:{port}";
+                        var url = $"http://*:{port}";
                         webBuilder.UseStartup<Startup>()
                         .UseUrls(url);
                     });
