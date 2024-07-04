@@ -62,6 +62,12 @@ namespace TestApi.Controllers
         {
             try
             {
+
+                var today = DateTime.Today;
+                var age = today.Year - staff.Birthday.Year;
+                if (staff.Birthday.Date > today.AddYears(-age)) age--;
+                if (age < 16) return BadRequest("Staff must be at least 16 years old.");
+
                 string query = @"INSERT INTO staff (staff_id, full_name, birthday, gender) 
                                  VALUES (@StaffId, @FullName, @Birthday, @Gender)";
                 var param = new DynamicParameters();
