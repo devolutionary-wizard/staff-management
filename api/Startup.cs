@@ -14,6 +14,15 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader());
+            });
+
             services.AddControllers();
             services.Configure<RouteOptions>(option => option.LowercaseUrls = true);
 
@@ -35,6 +44,7 @@ namespace Api
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("AllowAll");
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {

@@ -1,9 +1,11 @@
 import PageContainer from "../../components/container/PageContainer"
 import Breadcrumb from "../../components/shared/Breadcrumb"
+import StaffScreen from "../../screen/Staff/StaffScreen"
 
 const Staff = () => {
-    return <PageContainer title="Todo" description="this is todo List page">
-        <Breadcrumb title="Todo" items={[]} />
+    return <PageContainer title="Staff" description="this is Staff List page">
+        <Breadcrumb title="Staff" items={[]} />
+        <StaffScreen />
     </PageContainer>
 }
 
